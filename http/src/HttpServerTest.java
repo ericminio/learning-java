@@ -1,11 +1,8 @@
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -19,25 +16,22 @@ public class HttpServerTest {
 
     @Before
     public void startServer() throws Exception {
-        server = HttpServer.create( new InetSocketAddress( 5000 ), 0 );
-        server.createContext( "/", new HttpHandler() {
-            @Override
-            public void handle(HttpExchange exchange) throws IOException {
-                exchange.sendResponseHeaders( 200, 0 );
-                exchange.getResponseBody().close();
-            }
-        });
+        server = HttpServer.create( new InetSocketAddress( 8000 ), 0 );
+        server.createContext( "/", exchange -> {
+            exchange.sendResponseHeaders( 200, 0 );
+            exchange.close();
+        } );
         server.start();
     }
 
     @After
     public void stopServer() {
-        server.stop( 100 );
+        server.stop( 1 );
     }
 
     @Test
     public void canAnswerOKForAnyGetRequest() throws Exception {
-        URL url = new URL( "http://localhost:5000/any/resource" );
+        URL url = new URL( "http://localhost:8000" );
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         assertThat( connection.getResponseCode(), equalTo( 200 ) );
