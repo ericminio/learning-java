@@ -21,6 +21,11 @@ public class HttpServerTest {
             exchange.sendResponseHeaders( 200, 0 );
             exchange.close();
         } );
+        server.createContext( "/json", exchange -> {
+            exchange.getResponseHeaders().add( "content-type", "application/json" );
+            exchange.sendResponseHeaders( 200, 0 );
+            exchange.close();
+        } );
         server.start();
     }
 
@@ -35,5 +40,21 @@ public class HttpServerTest {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         assertThat( connection.getResponseCode(), equalTo( 200 ) );
+    }
+
+    @Test
+    public void answersWithoutContentTypeByDefault() throws Exception {
+        URL url = new URL( "http://localhost:8000" );
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        assertThat( connection.getHeaderField( "content-type" ), equalTo( null ) );
+    }
+
+    @Test
+    public void canAnswerWithJsonContentType() throws Exception {
+        URL url = new URL( "http://localhost:8000/json" );
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        assertThat( connection.getHeaderField( "content-type" ), equalTo( "application/json" ) );
     }
 }
