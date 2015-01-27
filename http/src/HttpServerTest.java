@@ -3,6 +3,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -24,6 +26,12 @@ public class HttpServerTest {
         server.createContext( "/json", exchange -> {
             exchange.getResponseHeaders().add( "content-type", "application/json" );
             exchange.sendResponseHeaders( 200, 0 );
+            exchange.close();
+        } );
+        server.createContext( "/need", exchange -> {
+            String body = "Love";
+            exchange.sendResponseHeaders( 200, body.length() );
+            exchange.getResponseBody().write( body.getBytes() );
             exchange.close();
         } );
         server.start();
@@ -56,5 +64,22 @@ public class HttpServerTest {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         assertThat( connection.getHeaderField( "content-type" ), equalTo( "application/json" ) );
+    }
+
+    @Test
+    public void canSendContent() throws Exception {
+        URL url = new URL( "http://localhost:8000/need" );
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        BufferedReader br = new BufferedReader( new InputStreamReader( (connection.getInputStream()) ) );
+        StringBuilder sb = new StringBuilder();
+        String output;
+        while ((output = br.readLine()) != null) {
+            sb.append( output );
+        }
+        String body = sb.toString();
+        br.close();
+
+        assertThat( body, equalTo( "Love" ) );
     }
 }
