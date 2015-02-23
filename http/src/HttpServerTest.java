@@ -3,8 +3,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -70,16 +69,10 @@ public class HttpServerTest {
     public void canSendContent() throws Exception {
         URL url = new URL( "http://localhost:8000/need" );
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        InputStream inputStream = connection.getInputStream();
+        byte[] response = new byte[ inputStream.available() ];
+        inputStream.read( response );
 
-        BufferedReader br = new BufferedReader( new InputStreamReader( (connection.getInputStream()) ) );
-        StringBuilder sb = new StringBuilder();
-        String output;
-        while ((output = br.readLine()) != null) {
-            sb.append( output );
-        }
-        String body = sb.toString();
-        br.close();
-
-        assertThat( body, equalTo( "Love" ) );
+        assertThat( new String( response ), equalTo( "Love" ) );
     }
 }
