@@ -39,7 +39,7 @@ public class HttpServerTest {
 
     @After
     public void stopServer() {
-        server.stop( 1 );
+        server.stop( 0 );
     }
 
     @Test
