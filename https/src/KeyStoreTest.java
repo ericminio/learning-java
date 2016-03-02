@@ -12,27 +12,19 @@ public class KeyStoreTest {
 
     @Test
     public void keyStoreCanBeOpened() throws Exception {
-        openKeyStore();
-    }
-
-    private KeyStore openKeyStore() throws Exception {
-        KeyStore keyStore = KeyStore.getInstance("jks");
-        FileInputStream file = new FileInputStream("./src/keystore.jks");
-        keyStore.load(file, "password".toCharArray());
-
-        return keyStore;
+        KeyStoreFactory.openKeyStore();
     }
 
     @Test
     public void keyStoreContainsKnownKey() throws Exception {
-        KeyStore ks = openKeyStore();
+        KeyStore ks = KeyStoreFactory.openKeyStore();
 
         assertTrue(ks.isKeyEntry("myalias"));
     }
 
     @Test
     public void knownKeyCanBeRead() throws Exception {
-        KeyStore ks = openKeyStore();
+        KeyStore ks = KeyStoreFactory.openKeyStore();
 
         assertThat(ks.getKey("myalias", "mypassword".toCharArray()), not(equalTo(null)));
     }
